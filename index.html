@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Мониторинг Ouroboros</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:0;}
+.container{max-width:960px;margin:auto;padding:20px;}
+header{background:#2c3e50;color:white;padding:15px;border-radius:5px;margin-bottom:20px;}
+header h1{margin:0;font-size:1.5rem;}
+.widget{background:white;padding:15px;border-radius:5px;margin-bottom:15px;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.widget h2{margin-top:0;font-size:1.2rem;border-bottom:1px solid #ddd;padding-bottom:5px;}
+#budget{font-size:1.3rem;color:#27ae60;}
+#status{font-size:1.1rem;}
+#tasks{font-size:0.9rem;}
+#perf{font-size:0.9rem;}
+.language-toggle{margin-top:10px;}
+.footer{font-size:0.9rem;color:#555;text-align:center;margin-top:30px;}
+</style>
+</head>
+<body>
+<div class="container">
+<header><h1 id="title">Мониторинг работы Ouroboros</h1></header>
+<div class="widget" id="budget-widget">
+<h2 id="budget-title">Бюджет</h2>
+<p id="budget">Загрузка...</p>
+</div>
+<div class="widget" id="status-widget">
+<h2 id="status-title">Статус системы</h2>
+<p id="status">Загрузка...</p>
+</div>
+<div class="widget" id="tasks-widget">
+<h2 id="tasks-title">Очередь задач</h2>
+<p id="tasks">Загрузка...</p>
+</div>
+<div class="widget" id="perf-widget">
+<h2 id="perf-title">Производительность</h2>
+<p id="perf">Загрузка...</p>
+</div>
+<button class="language-toggle" id="langToggle">Русский/English</button>
+<div class="footer">Ответственный: Александр Титаренко (@atitarenko)</div>
+</div>
+<script src="dashboard.js"></script>
+<script>
+// Simple translation dictionary
+const translations = {
+  ru: {
+    title: 'Мониторинг работы Ouroboros',
+    budget: 'Бюджет',
+    status: 'Статус системы',
+    tasks: 'Очередь задач',
+    perf: 'Производительность',
+    toggle: 'Русский/English',
+  },
+  en: {
+    title: 'Ouroboros Monitoring',
+    budget: 'Budget',
+    status: 'System Status',
+    tasks: 'Task Queue',
+    perf: 'Performance',
+    toggle: 'English/Русский',
+  }
+};
+// Load saved language or default Russian
+let lang = localStorage.getItem('lang') || 'ru';
+function applyLang(l) {
+  lang = l;
+  localStorage.setItem('lang', l);
+  const t = translations[l];
+  document.getElementById('title').textContent = t.title;
+  document.getElementById('budget-title').textContent = t.budget;
+  document.getElementById('status-title').textContent = t.status;
+  document.getElementById('tasks-title').textContent = t.tasks;
+  document.getElementById('perf-title').textContent = t.perf;
+  document.getElementById('langToggle').textContent = t.toggle;
+}
+applyLang(lang);
+// Toggle handler
+document.getElementById('langToggle').addEventListener('click', () => {
+  const next = lang === 'ru' ? 'en' : 'ru';
+  applyLang(next);
+});
+</script>
+</body>
+</html>
