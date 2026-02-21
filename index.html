@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>Ouroboros Dashboard</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .container { max-width: 1200px; margin: 0 auto; }
-    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .section { margin-bottom: 30px; padding: 15px; border: 1px solid #eee; border-radius: 5px; }
-  </style>
+<meta charset="UTF-8">
+<title>Мониторинг Ouroboros</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:0;}
+.container{max-width:960px;margin:auto;padding:20px;}
+header{background:#2c3e50;color:white;padding:15px;border-radius:5px;margin-bottom:20px;}
+header h1{margin:0;font-size:1.5rem;}
+.widget{background:white;padding:15px;border-radius:5px;margin-bottom:15px;box-shadow:0 1px 3px rgba(0,0,0,0.1);}
+.widget h2{margin-top:0;font-size:1.2rem;border-bottom:1px solid #ddd;padding-bottom:5px;}
+#budget{font-size:1.3rem;color:#27ae60;}
+#status{font-size:1.1rem;}
+#tasks{font-size:0.9rem;}
+#perf{font-size:0.9rem;}
+</style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>Ouroboros Monitoring Dashboard</h1>
-      <div id="budget">Loading budget...</div>
-    </header>
-
-    <div class="section">
-      <h2>Performance Metrics</h2>
-      <div id="perf">Loading performance data...</div>
-    </div>
-
-    <div class="section">
-      <h2>Active Tasks</h2>
-      <div id="tasks">Loading active tasks...</div>
-    </div>
-
-    <div class="section">
-      <h2>System Health</h2>
-      <div id="health">Loading health data...</div>
-    </div>
-
-    <script src="dashboard.js"></script>
-  </div>
+<div class="container">
+<header><h1>Мониторинг работы Ouroboros</h1></header>
+<div class="widget" id="budget-widget">
+<h2>Бюджет</h2>
+<p id="budget">Загрузка...</p>
+</div>
+<div class="widget" id="status-widget">
+<h2>Статус системы</h2>
+<p id="status">Загрузка...</p>
+</div>
+<div class="widget" id="tasks-widget">
+<h2>Очередь задач</h2>
+<p id="tasks">Загрузка...</p>
+</div>
+<div class="widget" id="perf-widget">
+<h2>Производительность</h2>
+<p id="perf">Загрузка...</p>
+</div>
+</div>
+<script src="dashboard.js"></script>
 </body>
 </html>
