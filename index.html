@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Ouroboros Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .section { margin-bottom: 30px; padding: 15px; border: 1px solid #eee; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Ouroboros Monitoring Dashboard</h1>
+      <div id="budget">Loading budget...</div>
+    </header>
+
+    <div class="section">
+      <h2>Performance Metrics</h2>
+      <div id="perf">Loading performance data...</div>
+    </div>
+
+    <div class="section">
+      <h2>Active Tasks</h2>
+      <div id="tasks">Loading active tasks...</div>
+    </div>
+
+    <div class="section">
+      <h2>System Health</h2>
+      <div id="health">Loading health data...</div>
+    </div>
+
+    <script src="dashboard.js"></script>
+  </div>
+</body>
+</html>
