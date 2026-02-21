@@ -14,28 +14,72 @@ header h1{margin:0;font-size:1.5rem;}
 #status{font-size:1.1rem;}
 #tasks{font-size:0.9rem;}
 #perf{font-size:0.9rem;}
+.language-toggle{margin-top:10px;}
+.footer{font-size:0.9rem;color:#555;text-align:center;margin-top:30px;}
 </style>
 </head>
 <body>
 <div class="container">
-<header><h1>Мониторинг работы Ouroboros</h1></header>
+<header><h1 id="title">Мониторинг работы Ouroboros</h1></header>
 <div class="widget" id="budget-widget">
-<h2>Бюджет</h2>
+<h2 id="budget-title">Бюджет</h2>
 <p id="budget">Загрузка...</p>
 </div>
 <div class="widget" id="status-widget">
-<h2>Статус системы</h2>
+<h2 id="status-title">Статус системы</h2>
 <p id="status">Загрузка...</p>
 </div>
 <div class="widget" id="tasks-widget">
-<h2>Очередь задач</h2>
+<h2 id="tasks-title">Очередь задач</h2>
 <p id="tasks">Загрузка...</p>
 </div>
 <div class="widget" id="perf-widget">
-<h2>Производительность</h2>
+<h2 id="perf-title">Производительность</h2>
 <p id="perf">Загрузка...</p>
 </div>
+<button class="language-toggle" id="langToggle">Русский/English</button>
+<div class="footer">Ответственный: Александр Титаренко (@atitarenko)</div>
 </div>
 <script src="dashboard.js"></script>
+<script>
+// Simple translation dictionary
+const translations = {
+  ru: {
+    title: 'Мониторинг работы Ouroboros',
+    budget: 'Бюджет',
+    status: 'Статус системы',
+    tasks: 'Очередь задач',
+    perf: 'Производительность',
+    toggle: 'Русский/English',
+  },
+  en: {
+    title: 'Ouroboros Monitoring',
+    budget: 'Budget',
+    status: 'System Status',
+    tasks: 'Task Queue',
+    perf: 'Performance',
+    toggle: 'English/Русский',
+  }
+};
+// Load saved language or default Russian
+let lang = localStorage.getItem('lang') || 'ru';
+function applyLang(l) {
+  lang = l;
+  localStorage.setItem('lang', l);
+  const t = translations[l];
+  document.getElementById('title').textContent = t.title;
+  document.getElementById('budget-title').textContent = t.budget;
+  document.getElementById('status-title').textContent = t.status;
+  document.getElementById('tasks-title').textContent = t.tasks;
+  document.getElementById('perf-title').textContent = t.perf;
+  document.getElementById('langToggle').textContent = t.toggle;
+}
+applyLang(lang);
+// Toggle handler
+document.getElementById('langToggle').addEventListener('click', () => {
+  const next = lang === 'ru' ? 'en' : 'ru';
+  applyLang(next);
+});
+</script>
 </body>
 </html>
