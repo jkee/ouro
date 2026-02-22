@@ -212,6 +212,18 @@ if not _init_st.get("initialized"):
     _implog_dir = REPO_DIR / "improvements-log"
     _implog_dir.mkdir(parents=True, exist_ok=True)
     (_implog_dir / ".gitkeep").touch(exist_ok=True)
+    # Commit and push init files so workers don't see untracked files
+    try:
+        import subprocess as _sp
+        _sp.run(["git", "add", "ARCHITECTURE.md", "IMPROVE.md", "improvements-log/"],
+                cwd=str(REPO_DIR), timeout=10, check=True)
+        _sp.run(["git", "commit", "-m", "init: add ARCHITECTURE.md, IMPROVE.md, improvements-log"],
+                cwd=str(REPO_DIR), timeout=30, check=True)
+        _sp.run(["git", "push", "origin", BRANCH_DEV],
+                cwd=str(REPO_DIR), timeout=60, check=True)
+        log.info("First-run init files committed and pushed")
+    except Exception:
+        log.warning("Failed to commit/push init files (will be picked up later)", exc_info=True)
     # Mark as initialized
     _init_st["initialized"] = True
     save_state(_init_st)

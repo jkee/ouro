@@ -141,6 +141,20 @@ class OuroborosAgent:
         """Check for uncommitted changes and attempt auto-rescue commit & push."""
         import re
         import subprocess
+        # Remove stale index.lock (race condition when multiple workers start)
+        lock_path = self.env.repo_dir / ".git" / "index.lock"
+        if lock_path.exists():
+            try:
+                import time
+                lock_age = time.time() - lock_path.stat().st_mtime
+                if lock_age > 30:  # stale if older than 30s
+                    lock_path.unlink(missing_ok=True)
+                    log.warning(f"Removed stale .git/index.lock (age={lock_age:.0f}s)")
+                else:
+                    # Another process is actively using git — skip
+                    return {"status": "ok", "note": "index.lock held by another process"}, 0
+            except Exception:
+                pass
         try:
             result = subprocess.run(
                 ["git", "status", "--porcelain"],
@@ -152,8 +166,8 @@ class OuroborosAgent:
                 # Auto-rescue: commit and push
                 auto_committed = False
                 try:
-                    # Only stage tracked files (not secrets/notebooks)
-                    subprocess.run(["git", "add", "-u"], cwd=str(self.env.repo_dir), timeout=10, check=True)
+                    # Stage all changes (tracked + untracked init files)
+                    subprocess.run(["git", "add", "-A"], cwd=str(self.env.repo_dir), timeout=10, check=True)
                     subprocess.run(
                         ["git", "commit", "-m", "auto-rescue: uncommitted changes detected on startup"],
                         cwd=str(self.env.repo_dir), timeout=30, check=True
