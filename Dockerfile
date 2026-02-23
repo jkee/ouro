@@ -34,6 +34,7 @@ RUN npm install -g @anthropic-ai/claude-code \
 RUN useradd -m -s /bin/bash ouroboros
 
 COPY . .
+RUN git config --global --add safe.directory /app
 RUN chown -R ouroboros:ouroboros /app
 
 ENTRYPOINT ["/usr/bin/tini", "--"]
