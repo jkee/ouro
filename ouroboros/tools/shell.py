@@ -87,7 +87,7 @@ def _run_shell(ctx: ToolContext, cmd, cwd: str = "") -> str:
 
 def _run_claude_cli(work_dir: str, prompt: str, env: dict) -> subprocess.CompletedProcess:
     """Run Claude CLI as ouroboros user with tempfile-based prompt."""
-    claude_bin = "/usr/local/bin/claude"
+    claude_bin = shutil.which("claude") or "claude"
     tmp_path = None
     try:
         with tempfile.NamedTemporaryFile(
