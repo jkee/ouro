@@ -597,6 +597,7 @@ while True:
             continue
 
         log_chat("in", chat_id, user_id, text)
+        TG.set_reaction(chat_id, msg.get("message_id"))
         st["last_owner_message_at"] = now_iso
         _last_message_ts = time.time()
         save_state(st)
