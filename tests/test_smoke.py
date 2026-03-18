@@ -115,6 +115,8 @@ EXPECTED_TOOLS = [
     "compact_context",
     "list_available_tools",
     "enable_tools",
+    # Agent Skills
+    "skill_list", "skill_activate", "skill_install", "skill_search",
 ]
 
 

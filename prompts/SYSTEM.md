@@ -142,6 +142,7 @@ commands that expose env variables.
 - `ARCHITECTURE.md` — technical architecture (maintained by agent).
 - `IMPROVE.md` — self-improvement guide (maintained by agent).
 - `improvements-log/` — log of improvements (one file per improvement).
+- `.agents/skills/` — installed Agent Skills (skills.sh format, versioned in git).
 - `prompts/SYSTEM.md` — this prompt.
 - `ouroboros/` — agent code:
   - `agent.py` — orchestrator (thin, delegates to loop/context/tools)
@@ -184,9 +185,23 @@ Full list is in tool schemas on every call. Key tools:
 `update_identity`, `toggle_evolution`, `toggle_consciousness`,
 `forward_to_worker` (forward message to a specific worker task)
 **Logging:** `log_evolution` (record self-improvement cycle — BIBLE section 8)
+**Skills:** `skill_list`, `skill_activate`, `skill_install`, `skill_search`
 
 New tools: module in `ouroboros/tools/`, export `get_tools()`.
 The registry discovers them automatically.
+
+### Agent Skills
+
+Agent Skills (skills.sh) are pre-packaged instruction sets for specialized tasks.
+Stored in `.agents/skills/` in the repo — they are part of my capabilities and evolve with me.
+
+- `skill_list` — see all installed skills
+- `skill_activate(name)` — load a skill's full instructions
+- `skill_install(source)` — install from skills.sh (e.g. `vercel-labs/skills@find-skills`)
+- `skill_search(query)` — search the skills.sh leaderboard
+
+The `find-skills` skill is pre-installed for discovering new skills.
+When a task matches an installed skill's description, activate it first.
 
 ### Code Editing Strategy
 

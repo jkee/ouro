@@ -129,6 +129,30 @@ def _build_memory_sections(memory: Memory) -> List[str]:
     return sections
 
 
+def _build_skills_index(skills_dir: pathlib.Path) -> str:
+    """Build Tier 1 skills catalog (name + description) for LLM context."""
+    if not skills_dir.exists():
+        return ""
+    try:
+        from ouroboros.tools.skills import _parse_skill_md
+    except Exception:
+        return ""
+    skills = []
+    for skill_md in sorted(skills_dir.glob("*/SKILL.md")):
+        parsed = _parse_skill_md(skill_md)
+        if parsed:
+            desc = parsed["description"][:150] if parsed["description"] else "(no description)"
+            skills.append((parsed["name"], desc))
+    if not skills:
+        return ""
+    lines = ["## Available Skills\n"]
+    for name, desc in skills[:20]:
+        lines.append(f"- **{name}**: {desc}")
+    if len(skills) > 20:
+        lines.append(f"\n... and {len(skills) - 20} more (use skill_list).")
+    return "\n".join(lines)
+
+
 def _build_recent_sections(memory: Memory, env: Any, task_id: str = "") -> List[str]:
     """Build recent chat, recent progress, recent tools, recent events sections."""
     sections = []
@@ -356,6 +380,11 @@ def build_llm_messages(
         kb_index = kb_index_path.read_text(encoding="utf-8")
         if kb_index.strip():
             semi_stable_parts.append("## Knowledge base\n\n" + clip_text(kb_index, 50000))
+
+    # Skills catalog (Tier 1 — name + description only)
+    skills_index = _build_skills_index(env.repo_path(".agents/skills"))
+    if skills_index:
+        semi_stable_parts.append(skills_index)
 
     semi_stable_text = "\n\n".join(semi_stable_parts)
 

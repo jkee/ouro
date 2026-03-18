@@ -211,16 +211,31 @@ if not _init_st.get("initialized"):
     _implog_dir = REPO_DIR / "improvements-log"
     _implog_dir.mkdir(parents=True, exist_ok=True)
     (_implog_dir / ".gitkeep").touch(exist_ok=True)
+    # Pre-install find-skills skill (Agent Skills format)
+    import subprocess as _sp
+    _skills_dir = REPO_DIR / ".agents" / "skills"
+    _skills_dir.mkdir(parents=True, exist_ok=True)
+    if not (_skills_dir / "find-skills").exists():
+        try:
+            _sp.run(
+                ["npx", "-y", "skills", "add",
+                 "https://github.com/vercel-labs/skills", "--skill", "find-skills"],
+                cwd=str(REPO_DIR), timeout=60,
+                capture_output=True, text=True,
+            )
+            log.info("Pre-installed find-skills skill")
+        except Exception:
+            log.warning("Failed to pre-install find-skills skill", exc_info=True)
     # Commit and push init files so workers don't see untracked files
     try:
-        import subprocess as _sp
-        _sp.run(["git", "add", "ARCHITECTURE.md", "IMPROVE.md", "improvements-log/"],
+        _sp.run(["git", "add", "ARCHITECTURE.md", "IMPROVE.md", "improvements-log/",
+                 ".agents/"],
                 cwd=str(REPO_DIR), timeout=10, check=True)
         # Only commit if there are staged changes
         _diff = _sp.run(["git", "diff", "--cached", "--quiet"],
                         cwd=str(REPO_DIR), timeout=10)
         if _diff.returncode != 0:
-            _sp.run(["git", "commit", "-m", "init: add ARCHITECTURE.md, IMPROVE.md, improvements-log"],
+            _sp.run(["git", "commit", "-m", "init: add ARCHITECTURE.md, IMPROVE.md, improvements-log, agent skills"],
                     cwd=str(REPO_DIR), timeout=30, check=True)
             _sp.run(["git", "push", "origin", BRANCH_DEV],
                     cwd=str(REPO_DIR), timeout=60, check=True)

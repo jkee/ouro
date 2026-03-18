@@ -54,6 +54,7 @@ Telegram --> launcher.py
                 control.py          -- restart, evolve, review
                 browser.py          -- Playwright (stealth)
                 review.py           -- multi-model review
+                skills.py           -- Agent Skills (skills.sh)
               llm.py                -- OpenRouter client
               memory.py             -- scratchpad, identity, chat
               review.py             -- code metrics

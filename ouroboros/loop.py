@@ -114,6 +114,7 @@ READ_ONLY_PARALLEL_TOOLS = frozenset({
     "repo_read", "repo_list",
     "drive_read", "drive_list",
     "web_search", "codebase_digest", "chat_history",
+    "skill_list",
 })
 
 # Stateful browser tools require thread-affinity (Playwright sync uses greenlet)

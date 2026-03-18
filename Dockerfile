@@ -30,6 +30,9 @@ RUN playwright install --with-deps chromium
 RUN npm install -g @anthropic-ai/claude-code \
     && claude --version
 
+# Pre-cache skills.sh CLI for Agent Skills support
+RUN npx -y skills --version || true
+
 # Create ouroboros OS user (bypassPermissions is blocked for root)
 RUN useradd -m -s /bin/bash ouroboros
 
