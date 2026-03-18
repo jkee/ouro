@@ -32,7 +32,7 @@ class ToolContext:
 
     repo_dir: pathlib.Path
     drive_root: pathlib.Path
-    branch_dev: str = field(default_factory=lambda: os.environ.get("OUROBOROS_BRANCH_PREFIX", "ouroboros"))
+    branch_dev: str = field(default_factory=lambda: os.environ["OUROBOROS_BRANCH_PREFIX"])
     pending_events: List[Dict[str, Any]] = field(default_factory=list)
     current_chat_id: Optional[int] = None
     current_task_type: Optional[str] = None

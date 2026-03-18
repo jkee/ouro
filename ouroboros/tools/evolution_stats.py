@@ -348,7 +348,7 @@ def _push_to_github(data: dict[str, Any]) -> str:
     repo = os.environ.get("GITHUB_REPO", "")
     repo_slug = f"{user}/{repo}"
     file_path = "docs/evolution.json"
-    branch = os.environ.get("GITHUB_BRANCH", os.environ.get("OUROBOROS_BRANCH_PREFIX", "ouroboros"))
+    branch = os.environ.get("GITHUB_BRANCH", os.environ["OUROBOROS_BRANCH_PREFIX"])
 
     url = f"https://api.github.com/repos/{repo_slug}/contents/{file_path}"
     headers = {
