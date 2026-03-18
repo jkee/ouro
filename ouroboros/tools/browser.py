@@ -33,6 +33,10 @@ _playwright_ready = False
 _pw_instance = None
 _pw_thread_id = None  # Track which thread owns the Playwright instance
 
+# Only one browser at a time to avoid OOM in the container (2 GB limit).
+# Acquired in _ensure_browser(), released in cleanup_browser().
+_browser_lock = threading.Lock()
+
 
 def _ensure_playwright_installed():
     """Install Playwright and Chromium if not already available."""
@@ -98,7 +102,11 @@ def _reset_playwright_greenlet():
 
 def _ensure_browser(ctx: ToolContext):
     """Create or reuse browser for this task. Browser state lives in ctx,
-    but Playwright instance is module-level to avoid greenlet issues."""
+    but Playwright instance is module-level to avoid greenlet issues.
+
+    Only one browser may be active at a time (memory constraint).
+    The lock is acquired here and released in cleanup_browser().
+    """
     global _pw_instance, _pw_thread_id
 
     # Check if we've switched threads - if so, reset everything
@@ -116,6 +124,11 @@ def _ensure_browser(ctx: ToolContext):
             pass
         # Browser died — clean up and recreate
         cleanup_browser(ctx)
+
+    # Acquire the single-browser lock (blocks until any other browser is cleaned up)
+    if not getattr(ctx.browser_state, '_holds_browser_lock', False):
+        _browser_lock.acquire()
+        ctx.browser_state._holds_browser_lock = True
 
     _ensure_playwright_installed()
 
@@ -195,6 +208,14 @@ def cleanup_browser(ctx: ToolContext) -> None:
     ctx.browser_state.page = None
     ctx.browser_state.browser = None
     ctx.browser_state.pw_instance = None
+
+    # Release the single-browser lock so other tasks can use the browser
+    if getattr(ctx.browser_state, '_holds_browser_lock', False):
+        ctx.browser_state._holds_browser_lock = False
+        try:
+            _browser_lock.release()
+        except RuntimeError:
+            pass  # lock already released
 
 
 _MARKDOWN_JS = """() => {
@@ -337,6 +358,8 @@ def get_tools() -> List[ToolEntry]:
                     "Open a URL in headless browser. Returns page content as text, "
                     "html, markdown, or screenshot (base64 PNG). "
                     "Browser persists across calls within a task. "
+                    "IMPORTANT: Only one browser instance runs at a time across all workers "
+                    "(memory constraint). Close the browser when done to unblock other tasks. "
                     "For screenshots: use send_photo tool to deliver the image to owner."
                 ),
                 "parameters": {
@@ -368,8 +391,8 @@ def get_tools() -> List[ToolEntry]:
             schema={
                 "name": "browser_action",
                 "description": (
-                    "Perform action on current browser page. Actions: "
-                    "click (selector), fill (selector + value), select (selector + value), "
+                    "Perform action on current browser page (single shared browser instance). "
+                    "Actions: click (selector), fill (selector + value), select (selector + value), "
                     "screenshot (base64 PNG), evaluate (JS code in value), "
                     "scroll (value: up/down/top/bottom)."
                 ),
