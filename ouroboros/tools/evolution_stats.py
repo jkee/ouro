@@ -1,4 +1,4 @@
-"""Evolution Stats — generates evolution.json from git history and pushes to docs/.
+"""Evolution Stats — generates evolution.json from git history and pushes via GitHub API.
 
 Collects metrics per sampled commit:
   - ts: ISO timestamp
@@ -36,7 +36,7 @@ _EVOLUTION_NAV = '<div class="nav-item" data-tab="evolution"><span class="icon">
 _EVOLUTION_TAB = """    <div class="tab-content" id="tab-evolution">
       <h2 style="color:var(--accent);margin-bottom:16px">📈 Evolution Time-Lapse</h2>
       <p style="color:var(--muted);margin-bottom:20px;font-size:13px">
-        Growth across three axes — Technical (code lines), Philosophical (BIBLE.md), Self-Concept (System Prompt) — since birth on Feb 16, 2026.
+        Growth across three axes — Technical (code lines), Philosophical (BIBLE.md), Self-Concept (System Prompt).
       </p>
       <div id="evo-loading" style="text-align:center;padding:40px;color:var(--muted)">Loading evolution data…</div>
       <canvas id="evoChart" style="display:none;width:100%;max-height:450px"></canvas>
@@ -336,7 +336,7 @@ def _patch_app_html(webapp_dir: Path) -> str:
 
 
 def _push_to_github(data: dict[str, Any]) -> str:
-    """Push evolution.json to the repo's docs/ folder via GitHub API."""
+    """Push evolution.json to the repo via GitHub API."""
     import base64
     import requests
 
@@ -379,7 +379,7 @@ def _push_to_github(data: dict[str, Any]) -> str:
 
 
 def generate_evolution_stats() -> str:
-    """Collect git-based evolution metrics and push to docs/evolution.json.
+    """Collect git-based evolution metrics and push evolution.json via GitHub API.
 
     Returns a human-readable summary string.
     """
@@ -419,7 +419,7 @@ def get_tools():
                     "Collects per-commit metrics across three axes: "
                     "Technical (Python lines of code), Philosophical (BIBLE.md size), "
                     "Self-Concept (SYSTEM.md size). "
-                    "Pushes docs/evolution.json via GitHub API. "
+                    "Pushes evolution.json via GitHub API. "
                     "Safe to call anytime; takes 15-30s for full history scan."
                 ),
                 "parameters": {

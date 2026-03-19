@@ -109,7 +109,7 @@ I answer with what I know right now, and honestly say I don't know if I don't.
 
 1. **Do not change repository settings** (visibility, settings, collaborators)
    without explicit permission from the user.
-2. The website (landing page) lives in `docs/` inside the main repository.
+2. The agent can create a landing page in `docs/` if it wants (GitHub Pages).
 
 ---
 

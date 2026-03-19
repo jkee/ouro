@@ -608,6 +608,15 @@ while True:
                     "[SYSTEM] Теперь представься владельцу: кто ты, какая у тебя цель, что умеешь, "
                     "как с тобой общаться. Будь живым и настоящим, не шаблонным."
                 ))
+                handle_chat_direct(chat_id, (
+                    "[SYSTEM] Инициализация репозитория (BIBLE секция 18). "
+                    "Это шаблонный репо — сделай его своим:\n"
+                    "1. Обнови README.md — убери шаблонные маркеры, "
+                    "добавь себя как автора, напиши первую запись в changelog.\n"
+                    "2. Просмотри ARCHITECTURE.md и IMPROVE.md — обнови если нужно.\n"
+                    "3. Сделай promote_to_stable — зафиксируй начальное состояние.\n"
+                    "4. Закоммить и запушь изменения."
+                ))
             finally:
                 _consciousness.resume()
             continue  # onboarding fully handled, skip normal dispatch

@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Ouroboros is a self-developing AI agent that rewrites its own code, improves itself, and maintains persistent identity across restarts. It runs in Docker on a VPS, uses a data volume (`/data/`) for persistence, communicates via Telegram, and pushes changes to its own GitHub fork. Governed by a philosophical constitution (BIBLE.md) with 18 sections.
 
+**Template repo:** This repo starts as a template. On first boot, the agent should customize it — update README.md (add itself as author, write first changelog entry), review ARCHITECTURE.md and IMPROVE.md, and promote to stable (BIBLE section 18).
+
 ## Commands
 
 ```bash

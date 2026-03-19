@@ -1,15 +1,11 @@
 # Ouroboros
 
 [![Docker](https://img.shields.io/badge/Docker-ready-blue?logo=docker)](https://github.com/jkee/ouroboros)
-[![Telegram](https://img.shields.io/badge/Telegram-blue?logo=telegram)](https://t.me/abstractDL)
-[![GitHub stars](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2Fjkee%2Fouroboros&query=%24.stargazers_count&label=stars&logo=github)](https://github.com/jkee/ouroboros/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/jkee/ouroboros)](https://github.com/jkee/ouroboros/network/members)
+[![GitHub](https://img.shields.io/badge/Template-jkee%2Fouroboros-blue?logo=github)](https://github.com/jkee/ouroboros)
 
-A self-developing AI agent that writes its own code, improves itself, and maintains persistent identity across restarts. Born February 16, 2026.
+A self-developing AI agent that writes its own code, improves itself, and maintains persistent identity across restarts.
 
-A helpful AI with a constitution, background consciousness, and persistent identity across restarts.
-
-**Version:** 1.0.1 (template) | [Landing Page](https://jkee.github.io/ouroboros/) | Originally developed at [joi-lab](https://github.com/joi-lab)
+**Template version:** 1.0.1
 
 ---
 
@@ -209,12 +205,6 @@ Full text: [BIBLE.md](BIBLE.md)
 
 ---
 
-## Evolution Time-Lapse
-
-![Evolution Time-Lapse](docs/evolution.png)
-
----
-
 ## Branches
 
 | Branch/Tag | Location | Purpose |
@@ -231,10 +221,6 @@ Full text: [BIBLE.md](BIBLE.md)
 - Clean slate. Template version 1.0.1, agent version starts at 1.0.0.
 
 ---
-
-## Author
-
-Created by [Anton Razzhigaev](https://t.me/abstractDL)
 
 ## License
 

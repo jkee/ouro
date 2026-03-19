@@ -207,7 +207,7 @@ class LLMClient:
                 base_url=self._base_url,
                 api_key=self._api_key,
                 default_headers={
-                    "HTTP-Referer": "https://github.com/jkee/ouroboros",
+                    "HTTP-Referer": f"https://github.com/{os.environ.get('GITHUB_USER', 'jkee')}/{os.environ.get('GITHUB_REPO', 'ouroboros')}",
                     "X-Title": "Ouroboros",
                 },
             )
