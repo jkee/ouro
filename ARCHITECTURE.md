@@ -51,7 +51,7 @@ Four execution contexts, each with a distinct role:
 
 Process management, Telegram interface, task lifecycle, state persistence, git operations.
 
-### launcher.py (~796 lines)
+### launcher.py (~833 lines)
 
 Main entry point. Runs the boot sequence, then enters an infinite main loop:
 
@@ -60,7 +60,7 @@ Main entry point. Runs the boot sequence, then enters an infinite main loop:
 - **Supervisor commands**: `/status`, `/break`, `/panic`, `/restart`, `/review`, `/evolve`, `/no-approve`, `/bg`, `/budget`, `/rollback`.
 - **Chat watchdog**: monitors direct-chat thread for hangs, enforces timeouts.
 
-### supervisor/workers.py (~538 lines)
+### supervisor/workers.py (~555 lines)
 
 Worker pool management. Up to `MAX_WORKERS` (default 5) processes.
 
@@ -79,12 +79,15 @@ SSOT for persistent state. File: `/data/state/state.json`.
 - **Budget tracking**: local accumulation per LLM call + periodic OpenRouter ground-truth sync (every 10 calls).
 - **Key fields**: `owner_id`, `spent_usd`, `spent_tokens_*`, `openrouter_limit_remaining`, `current_branch`, `no_approve_mode`, `evolution_mode_enabled`, `initialized`.
 
-### supervisor/telegram.py (~499 lines)
+### supervisor/telegram.py (~591 lines)
 
 Telegram Bot API wrapper (raw HTTP, no library dependency).
 
 - `get_updates()` — long-polling with retry logic.
-- `send_with_budget()` — markdown→HTML conversion, auto-splits messages >3800 chars, tracks per-message cost.
+- `send_with_budget()` — markdown→HTML conversion, auto-splits messages >3800 chars, tracks per-message cost. Supports `reply_to_message_id` for threading replies.
+- `send_message_reply()` — sends a message as a reply, returns sent message ID.
+- `edit_message_text()` — edits an existing message (retry pattern).
+- `delete_message()` — best-effort delete (no retries).
 - `download_file_base64()` — fetches images/documents for vision tasks.
 - `send_photo()` — sends screenshots from browser tools.
 
@@ -117,15 +120,17 @@ Persistent cron scheduler. Stores recurring tasks in `/data/crons.json` with its
 - **Budget gate**: skips all crons if budget below `EVOLUTION_BUDGET_RESERVE`.
 - **Notifications**: optional per-cron `notify` flag sends Telegram message on fire.
 
-### supervisor/events.py (~486 lines)
+### supervisor/events.py (~570 lines)
 
 Event dispatcher. Workers communicate with supervisor exclusively through a multiprocessing Queue.
 
+- `status_start` — sends "⏳" reply to user's original message, tracks status message per task.
+- `status_update` — edits status message with progress text (2s debounce). Falls back to separate progress message for tasks without a status message (evolution, consciousness, worker-mode).
 - `llm_usage` — accumulates token costs, logs to events.jsonl.
 - `task_heartbeat` — updates last progress time in RUNNING.
 - `typing_start` — sends Telegram typing indicator.
-- `send_message` — routes message to Telegram with budget tracking.
-- `task_done` — removes from RUNNING, updates evolution circuit breaker, stores task result.
+- `send_message` — routes message to Telegram with budget tracking. Deletes status message and replies to original message if status was tracked.
+- `task_done` — removes from RUNNING, updates evolution circuit breaker, stores task result. Cleans up orphaned status messages.
 
 ---
 
@@ -142,7 +147,7 @@ Per-worker orchestrator. Created fresh in each worker process.
 - Restart verification: after code push, verifies new worker loads correct git SHA.
 - Auto-rescue: detects and commits uncommitted changes on startup.
 
-### ouro/loop.py (~980 lines) — largest module
+### ouro/loop.py (~920 lines) — largest module
 
 Core LLM tool execution loop. This is my thinking-acting cycle.
 
@@ -304,11 +309,13 @@ Telegram poll → launcher.py → batch (1.5s window)
 
 ```
 worker_main() → Agent.handle_task()
+  → status_start event → supervisor replies "⏳" to user's message
   → context.build_llm_messages()
   → loop.run_llm_loop()
-    → [LLM call → parse tool calls → execute tools]* (up to 200 rounds)
+    → [LLM call → parse tool calls → status_update (tool names) → execute tools]* (up to 200 rounds)
     → emit events (llm_usage, task_heartbeat)
-  → task_done event → supervisor drains queue → Telegram response
+  → send_message event → supervisor deletes "⏳", sends final result as reply
+  → task_done event → supervisor drains queue
 ```
 
 ### Self-Modification
@@ -391,15 +398,15 @@ Reference table for complexity tracking (BIBLE.md §8: keep under 2000 lines).
 
 | Module | Lines | Status |
 |--------|-------|--------|
-| ouro/loop.py | ~980 | ⚠️ At limit |
+| ouro/loop.py | ~920 | OK |
 | ouro/context.py | ~818 | OK |
-| launcher.py | ~796 | OK |
+| launcher.py | ~833 | OK |
 | ouro/agent.py | ~664 | OK |
 | supervisor/state.py | ~600 | OK |
-| supervisor/workers.py | ~538 | OK |
+| supervisor/workers.py | ~555 | OK |
 | ouro/consciousness.py | ~525 | OK |
-| supervisor/telegram.py | ~499 | OK |
-| supervisor/events.py | ~486 | OK |
+| supervisor/telegram.py | ~591 | OK |
+| supervisor/events.py | ~570 | OK |
 | supervisor/git_ops.py | ~465 | OK |
 | supervisor/queue.py | ~421 | OK |
 | supervisor/cron.py | ~230 | OK |
