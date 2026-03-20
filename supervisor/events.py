@@ -32,6 +32,7 @@ log = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 _STATUS_MESSAGES: Dict[str, Dict] = {}
 # {task_id: {chat_id, status_msg_id, original_msg_id, last_edit_ts, last_text}}
+_SPINNER_FRAMES = "⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏"
 
 
 def _handle_status_start(evt: Dict[str, Any], ctx: Any) -> None:
@@ -44,7 +45,7 @@ def _handle_status_start(evt: Dict[str, Any], ctx: Any) -> None:
     if not chat_id or not task_id:
         return
     try:
-        initial_text = "⏳ _thinking…_"
+        initial_text = f"{_SPINNER_FRAMES[0]} _thinking…_"
         ok, err, sent_id = ctx.TG.send_message_reply(chat_id, initial_text, original_msg_id, parse_mode="Markdown")
         if ok and sent_id:
             _STATUS_MESSAGES[task_id] = {
@@ -75,8 +76,8 @@ def _handle_status_update(evt: Dict[str, Any], ctx: Any) -> None:
     status["counter"] = status.get("counter", 0) + 1
     counter = status["counter"]
     status["last_body"] = text[:180] if text else "thinking…"
-    hourglass = "⏳" if counter % 2 == 0 else "⌛"
-    new_text = f"{hourglass} _{text[:180]}_ · {counter}" if text else hourglass
+    spinner = _SPINNER_FRAMES[status.get("frame", 0) % len(_SPINNER_FRAMES)]
+    new_text = f"{spinner} _{text[:180]}_ · {counter}" if text else spinner
     now = time.time()
     if now - status["last_edit_ts"] < 1.0:
         status["last_text"] = new_text  # store for lazy flush
@@ -90,10 +91,10 @@ def _handle_status_update(evt: Dict[str, Any], ctx: Any) -> None:
 
 
 def tick_status_animations(ctx: Any) -> None:
-    """Flip hourglass and resend typing indicator independently of agent events.
+    """Rotate braille spinner and resend typing indicator independently of agent events.
 
     Called from the supervisor tick() loop (~every 0.1s). Debounced to at most
-    one edit per second per status message.
+    one edit per second per status message. Frame is time-based (0.2s/frame).
     """
     if not _STATUS_MESSAGES:
         return
@@ -102,11 +103,13 @@ def tick_status_animations(ctx: Any) -> None:
         elapsed = now - status["last_edit_ts"]
         if elapsed < 1.0:
             continue
-        status["counter"] = status.get("counter", 0) + 1
-        counter = status["counter"]
-        hourglass = "⏳" if counter % 2 == 0 else "⌛"
+        # Advance frame based on elapsed time (~0.2s per frame)
+        status["frame"] = status.get("frame", 0) + max(1, int(elapsed / 0.2))
+        frame = status["frame"]
+        spinner = _SPINNER_FRAMES[frame % len(_SPINNER_FRAMES)]
+        counter = status.get("counter", 0)
         body = status.get("last_body") or "thinking…"
-        new_text = f"{hourglass} _{body}_ · {counter}"
+        new_text = f"{spinner} _{body}_ · {counter}"
         # Always update timestamp to maintain debounce even on failure
         status["last_edit_ts"] = now
         try:
@@ -114,8 +117,8 @@ def tick_status_animations(ctx: Any) -> None:
             status["last_text"] = new_text
         except Exception:
             log.debug("tick_status_animations: edit failed for task %s", task_id, exc_info=True)
-        # Resend typing indicator every ~5 seconds
-        if counter % 5 == 0:
+        # Resend typing indicator every ~5 seconds (~25 frames × 0.2s = 5s)
+        if frame % 25 == 0:
             try:
                 ctx.TG.send_chat_action(status["chat_id"], "typing")
             except Exception:
