@@ -26,34 +26,26 @@ _ACTIVE_MODE_SEC: int = 300  # 5 min of activity = active polling mode
 def _describe_unknown_content(msg: dict) -> str:
     """Build a text description for unsupported Telegram message content types."""
     if msg.get("voice"):
-        dur = msg["voice"].get("duration", "?")
-        return f"[Voice message, duration: {dur}s]"
+        return "[Unsupported message type: voice message]"
     if msg.get("audio"):
-        a = msg["audio"]
-        name = a.get("title") or a.get("file_name") or "unknown"
-        return f"[Audio: {name}, duration: {a.get('duration', '?')}s]"
+        return "[Unsupported message type: audio]"
     if msg.get("video"):
-        return f"[Video, duration: {msg['video'].get('duration', '?')}s]"
+        return "[Unsupported message type: video]"
     if msg.get("video_note"):
-        return f"[Video note, duration: {msg['video_note'].get('duration', '?')}s]"
+        return "[Unsupported message type: video note]"
     if msg.get("sticker"):
-        emoji = msg["sticker"].get("emoji", "")
-        return f"[Sticker: {emoji}]"
+        return "[Unsupported message type: sticker]"
     if msg.get("animation"):
-        return "[GIF animation]"
+        return "[Unsupported message type: GIF animation]"
     if msg.get("document"):
-        d = msg["document"]
-        return f"[Document: {d.get('file_name', 'unknown')}, type: {d.get('mime_type', 'unknown')}]"
+        return "[Unsupported message type: document]"
     if msg.get("location"):
-        loc = msg["location"]
-        return f"[Location: {loc.get('latitude')}, {loc.get('longitude')}]"
+        return "[Unsupported message type: location]"
     if msg.get("contact"):
-        c = msg["contact"]
-        name = f"{c.get('first_name', '')} {c.get('last_name', '')}".strip()
-        return f"[Contact: {name}, {c.get('phone_number', '')}]"
+        return "[Unsupported message type: contact]"
     if msg.get("poll"):
-        return f"[Poll: {msg['poll'].get('question', '')}]"
-    return "[Unknown message format]"
+        return "[Unsupported message type: poll]"
+    return "[Unsupported message type: unknown]"
 
 
 class Supervisor:
