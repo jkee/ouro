@@ -131,7 +131,7 @@ class TelegramClient:
 
     def edit_message_text(self, chat_id: int, message_id: int, text: str,
                           parse_mode: str = "") -> Tuple[bool, str]:
-        """Edit a message's text. Same retry pattern as send_message."""
+        """Edit a message's text. No retries on rate limit (429)."""
         last_err = "unknown"
         for attempt in range(3):
             try:
@@ -140,6 +140,15 @@ class TelegramClient:
                 if parse_mode:
                     payload["parse_mode"] = parse_mode
                 r = requests.post(f"{self.base}/editMessageText", data=payload, timeout=30)
+                if r.status_code == 429:
+                    retry_after = 0
+                    try:
+                        retry_after = r.json().get("parameters", {}).get("retry_after", 0)
+                    except Exception:
+                        pass
+                    log.warning("Telegram rate limit on editMessageText (msg_id=%d), retry_after=%ds",
+                                message_id, retry_after)
+                    return False, "rate_limited"
                 r.raise_for_status()
                 data = r.json()
                 if data.get("ok") is True:

@@ -83,9 +83,11 @@ def _handle_status_update(evt: Dict[str, Any], ctx: Any) -> None:
         status["last_text"] = new_text  # store for lazy flush
         return
     try:
-        ctx.TG.edit_message_text(status["chat_id"], status["status_msg_id"], new_text, parse_mode="Markdown")
+        ok, err = ctx.TG.edit_message_text(status["chat_id"], status["status_msg_id"], new_text, parse_mode="Markdown")
         status["last_edit_ts"] = now
         status["last_text"] = new_text
+        if err == "rate_limited":
+            status["last_edit_ts"] = now + 2.0  # back off via debounce
     except Exception:
         log.debug("Failed to edit status message", exc_info=True)
 
@@ -113,8 +115,10 @@ def tick_status_animations(ctx: Any) -> None:
         # Always update timestamp to maintain debounce even on failure
         status["last_edit_ts"] = now
         try:
-            ctx.TG.edit_message_text(status["chat_id"], status["status_msg_id"], new_text, parse_mode="Markdown")
+            ok, err = ctx.TG.edit_message_text(status["chat_id"], status["status_msg_id"], new_text, parse_mode="Markdown")
             status["last_text"] = new_text
+            if err == "rate_limited":
+                status["last_edit_ts"] = now + 2.0  # back off via debounce
         except Exception:
             log.debug("tick_status_animations: edit failed for task %s", task_id, exc_info=True)
         # Resend typing indicator every ~5 seconds (~25 frames × 0.2s = 5s)
