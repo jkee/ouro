@@ -529,8 +529,8 @@ class BackgroundConsciousness:
             st["arch_review_index"] = advance_index(current_index)
             save_state(st)
             self.inject_observation(
-                f"ARCH REVIEW DUE: Schedule a daily architecture review task for block {current_index}: '{block['name']}'. "
-                f"Use schedule_task tool. Task description: Read the relevant code files, analyze for complexity/simplicity violations per BIBLE.md, "
+                f"DAILY REVIEW DUE: Schedule a review task for block {current_index}: '{block['name']}'. "
+                f"Use schedule_task tool. Task description: Read the relevant files, analyze thoroughly per the block's focus area, "
                 f"identify ONE specific improvement if any, report findings to user via send_owner_message (2-3 sentences max). "
                 f"Do NOT rewrite everything."
             )

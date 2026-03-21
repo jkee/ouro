@@ -5,13 +5,15 @@ Tracks which module was last reviewed and schedules the next review automaticall
 The user asked for incremental daily reviews: one block per day, rotating through
 all modules in a cycle.
 
-Blocks (6 total, one per day):
+Blocks (8 total, one per day):
   0 → agent.py + loop.py        (orchestration & execution engine)
   1 → context.py + llm.py       (context building & LLM client)
   2 → tools/ directory           (tool plugin system)
   3 → memory.py + consciousness.py (memory & background loop)
   4 → supervisor/ directory      (telegram, state, events, queue, workers)
-  5 → review.py + arch_review.py + metrics (code quality & review system)
+  5 → prompts + BIBLE.md         (system prompt & constitution)
+  6 → log files                  (error & anomaly review)
+  7 → tools + skills ecosystem   (gaps & improvements)
 """
 
 from __future__ import annotations
@@ -92,6 +94,31 @@ REVIEW_BLOCKS = [
             "Are there contradictions between SYSTEM.md and BIBLE.md? "
             "Is the consciousness prompt giving good guidance? "
             "Look for: stale references, missing capabilities, unclear instructions."
+        ),
+    },
+    {
+        "index": 6,
+        "name": "Log Error Review",
+        "files": ["/data/logs/events.jsonl", "/data/logs/tools.jsonl", "/data/logs/supervisor.jsonl"],
+        "focus": (
+            "Review recent log files for errors, warnings, and anomalies. "
+            "Read the last portion of each log file via drive_read. "
+            "Look for: recurring errors, tool failures, consciousness errors, "
+            "worker crashes, budget anomalies, unexpected patterns. "
+            "If issues found, assess severity and whether a fix task should be scheduled."
+        ),
+    },
+    {
+        "index": 7,
+        "name": "Tools & Skills Improvement",
+        "files": ["ouro/tools/", ".agents/skills/"],
+        "focus": (
+            "Review the tool and skill ecosystem for gaps and improvements. "
+            "Check: are all tools working correctly? Are there missing tools that would be useful? "
+            "Are existing tool schemas accurate and well-documented? "
+            "Review installed skills — are they up to date? Are there useful skills to install? "
+            "Look for: broken tools, missing capabilities, duplicate functionality, "
+            "skill catalog gaps. Propose small, focused improvements only."
         ),
     },
 ]
