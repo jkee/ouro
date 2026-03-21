@@ -3,6 +3,7 @@ name: "Model Knowledge"
 description: "Guide for choosing the right LLM — capabilities, cost tiers, and when to switch"
 version: "1.0.0"
 tags: ["models", "llm", "budget", "switch-model"]
+auto_activate: true
 last_updated: "2026-03-18"
 ---
 

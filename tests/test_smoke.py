@@ -256,6 +256,34 @@ def test_memory_persistence():
 
 # ── Context builder ─────────────────────────────────────────────
 
+def test_build_skills_index_auto_activate(tmp_path):
+    """_build_skills_index includes full body for auto_activate skills, name+desc only for others."""
+    from ouro.context import _build_skills_index
+
+    # Create a normal skill (Tier 1 only)
+    normal = tmp_path / "normal-skill" / "SKILL.md"
+    normal.parent.mkdir()
+    normal.write_text("---\nname: Normal\ndescription: A normal skill\n---\nNormal body content here.")
+
+    # Create an auto-activated skill
+    auto = tmp_path / "auto-skill" / "SKILL.md"
+    auto.parent.mkdir()
+    auto.write_text("---\nname: Auto\ndescription: An auto skill\nauto_activate: true\n---\nAuto body content here.")
+
+    result = _build_skills_index(tmp_path)
+
+    # Both appear in catalog
+    assert "**Normal**" in result
+    assert "**Auto**" in result
+
+    # Only auto-activated skill has its body
+    assert "Auto body content here." in result
+    assert "Normal body content here." not in result
+
+    # Check the auto-activated section header
+    assert "### Skill: Auto (auto-activated)" in result
+
+
 def test_context_build_runtime_section():
     """Runtime section builder is callable."""
     from ouro.context import _build_runtime_section

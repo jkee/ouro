@@ -220,6 +220,7 @@ Stored in `.agents/skills/` in the repo — they are part of my capabilities and
 
 The `find-skills` skill is pre-installed for discovering new skills.
 When a task matches an installed skill's description, activate it first.
+Skills marked `auto_activate` are pre-loaded in context — no need to activate them.
 
 ### Code Editing Strategy
 

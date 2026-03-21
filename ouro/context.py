@@ -130,7 +130,11 @@ def _build_memory_sections(memory: Memory) -> List[str]:
 
 
 def _build_skills_index(skills_dir: pathlib.Path) -> str:
-    """Build Tier 1 skills catalog (name + description) for LLM context."""
+    """Build Tier 1 skills catalog (name + description) for LLM context.
+
+    Skills with ``auto_activate: true`` in frontmatter get their full body
+    included directly, so the LLM never needs to call ``skill_activate``.
+    """
     if not skills_dir.exists():
         return ""
     try:
@@ -138,11 +142,14 @@ def _build_skills_index(skills_dir: pathlib.Path) -> str:
     except Exception:
         return ""
     skills = []
+    auto_activated: List[Tuple[str, str]] = []  # (name, body)
     for skill_md in sorted(skills_dir.glob("*/SKILL.md")):
         parsed = _parse_skill_md(skill_md)
         if parsed:
             desc = parsed["description"][:150] if parsed["description"] else "(no description)"
             skills.append((parsed["name"], desc))
+            if parsed["metadata"].get("auto_activate"):
+                auto_activated.append((parsed["name"], parsed["body"]))
     if not skills:
         return ""
     lines = ["## Available Skills\n"]
@@ -150,6 +157,9 @@ def _build_skills_index(skills_dir: pathlib.Path) -> str:
         lines.append(f"- **{name}**: {desc}")
     if len(skills) > 20:
         lines.append(f"\n... and {len(skills) - 20} more (use skill_list).")
+    # Append full content for auto-activated skills
+    for name, body in auto_activated:
+        lines.append(f"\n### Skill: {name} (auto-activated)\n\n{body}")
     return "\n".join(lines)
 
 
