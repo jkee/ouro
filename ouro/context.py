@@ -322,6 +322,23 @@ def _build_health_invariants(env: Any) -> str:
     return "## Health Invariants\n\n" + "\n".join(f"- {c}" for c in checks)
 
 
+_STATE_CONTEXT_KEYS = frozenset({
+    "owner_id", "spent_usd", "spent_calls", "current_branch", "current_sha",
+    "no_approve_mode", "evolution_mode_enabled", "evolution_cycle",
+    "initialized", "openrouter_limit", "openrouter_limit_remaining",
+})
+
+
+def _filter_state_for_context(state_json: str) -> str:
+    """Keep only decision-relevant fields from state.json for LLM context."""
+    try:
+        data = json.loads(state_json)
+        filtered = {k: v for k, v in data.items() if k in _STATE_CONTEXT_KEYS}
+        return json.dumps(filtered, ensure_ascii=False, indent=2)
+    except (json.JSONDecodeError, ValueError):
+        return state_json
+
+
 def build_llm_messages(
     env: Any,
     memory: Memory,
@@ -392,7 +409,7 @@ def build_llm_messages(
 
     # Dynamic content: changes every round
     dynamic_parts = [
-        "## Drive state\n\n" + clip_text(state_json, 90000),
+        "## Drive state\n\n" + clip_text(_filter_state_for_context(state_json), 90000),
         _build_runtime_section(env, task),
     ]
 

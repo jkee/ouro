@@ -311,7 +311,7 @@ class BackgroundConsciousness:
         bible_path = self._repo_dir / "BIBLE.md"
         if bible_path.exists():
             bible = read_text(bible_path)
-            parts.append("## BIBLE.md\n\n" + clip_text(bible, 12000))
+            parts.append("## BIBLE.md\n\n" + clip_text(bible, 6000))
 
         # Identity
         identity_path = self._drive_root / "memory" / "identity.md"
